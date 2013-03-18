@@ -13,9 +13,10 @@ object Application extends Controller {
   def search(query: String) = Action {
     import Play.current
     import ExecutionContext.Implicits.global
+    val responseTime = Play.current.configuration.getInt("responseTime").getOrElse(20)
     if (Play.current.configuration.getBoolean("down").getOrElse(false)) {
       val promise = Promise[Result]
-      Akka.system.scheduler.scheduleOnce(30 seconds) {
+      Akka.system.scheduler.scheduleOnce(responseTime milliseconds) {
         promise.success(InternalServerError)
       }
       Async {
@@ -23,7 +24,7 @@ object Application extends Controller {
       }
     } else {
       val promise = Promise[Result]
-      Akka.system.scheduler.scheduleOnce(20 milliseconds) {
+      Akka.system.scheduler.scheduleOnce(responseTime milliseconds) {
         promise.success(Ok(toJson(Map("query" -> toJson(query), "results" -> toJson(Seq(
           toJson(Map("productId" -> toJson(10), "description" -> toJson("Some product"))),
           toJson(Map("productId" -> toJson(11), "description" -> toJson("Some other product")))
