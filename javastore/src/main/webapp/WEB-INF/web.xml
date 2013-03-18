@@ -4,10 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
         version="2.5">
-    <servlet>
-        <servlet-name>index</servlet-name>
-        <servlet-class>controllers.IndexServlet</servlet-class>
-    </servlet>
+
     <servlet>
         <servlet-name>payments</servlet-name>
         <servlet-class>controllers.PaymentsServlet</servlet-class>
@@ -16,10 +13,7 @@
         <servlet-name>search</servlet-name>
         <servlet-class>controllers.SearchServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>index</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>payments</servlet-name>
         <url-pattern>/payments</url-pattern>
