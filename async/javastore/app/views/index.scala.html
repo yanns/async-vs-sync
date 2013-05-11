@@ -1,0 +1,17 @@
+@main("Welcome to our website.") {
+
+    <form action="@routes.Application.search("")" method="get">
+        <input type="text" name="query" placeholder="Search"></input>
+        <button type="submit">SEARCH</button>
+    </form>
+
+    <a href="@routes.Application.search("test")">query with search provider</a>
+
+    <form action="@routes.Application.payments()" method="post">
+        <input type="text" name="amount"></input>
+        amount
+
+        <button type="submit">BUY</button>
+    </form>
+
+}
