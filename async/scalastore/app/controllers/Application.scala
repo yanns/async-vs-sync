@@ -1,14 +1,14 @@
 package controllers
 
 import play.api.mvc._
-import play.api.libs.ws._
-import play.api.libs.json._
 import play.api.data._
 import play.api.data.Forms._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import models.{Payment, Query}
+import scala.util.{Success, Failure}
 
-object Application extends Controller {
+object Application extends Controller with Query with Payment {
   
   def index = Action {
     Ok(views.html.index())
@@ -16,14 +16,9 @@ object Application extends Controller {
 
   def search(query: String) = Action {
     Async {
-      WS.url("http://localhost:9001/search?query=" + query).get().map { response =>
-        response.status match {
-          case 200 => {
-            val results = (response.json \ "results").as[Seq[JsObject]]
-            Ok(results.map(_ \ "description").mkString("Found results: ", ", ", ".\n"))
-          }
-          case _ => InternalServerError(s"Error calling search service.\nResponse status ${response.status}\n")
-        }
+      searchStock(query).map {
+        case Success(results) => Ok(results.map(_ \ "description").mkString("Found results: ", ", ", ".\n"))
+        case Failure(e)       => InternalServerError(e.getMessage)
       }
     }
   }
@@ -33,11 +28,9 @@ object Application extends Controller {
   def payments = Action { implicit request =>
     val amount = paymentForm.bindFromRequest.get
     Async {
-      WS.url("http://localhost:9002/payments").post(Json.toJson(Map("amount" -> amount))).map { response =>
-        response.status match {
-          case 200 => Ok("Payment processed.\n")
-          case _ => InternalServerError(s"Error calling payment service.\nResponse status ${response.status}\n")
-        }
+      procedePayments(amount).map {
+        case Success(msg) => Ok(msg)
+        case Failure(e)   => InternalServerError(e.getMessage)
       }
     }
   }
