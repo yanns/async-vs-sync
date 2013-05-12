@@ -5,10 +5,10 @@ import play.api.data._
 import play.api.data.Forms._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import models.{Payment, Query}
+import models.{Payment, StockQuery}
 import scala.util.{Success, Failure}
 
-object Application extends Controller with Query with Payment {
+object Application extends Controller with StockQuery with Payment {
   
   def index = Action {
     Ok(views.html.index())
@@ -28,7 +28,7 @@ object Application extends Controller with Query with Payment {
   def payments = Action { implicit request =>
     val amount = paymentForm.bindFromRequest.get
     Async {
-      procedePayments(amount).map {
+      proceedPayments(amount).map {
         case Success(msg) => Ok(msg)
         case Failure(e)   => InternalServerError(e.getMessage)
       }

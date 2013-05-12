@@ -6,10 +6,10 @@ import scala.util.{Failure, Success, Try}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait Query {
+trait StockQuery {
 
   def searchStock(query: String): Future[Try[Seq[JsObject]]] = {
-    WS.url("http://localhost:9001/search?query=" + query).get().map { response =>
+    WS.url("http://localhost:9001/search").withQueryString("query" -> query).get().map { response =>
       response.status match {
         case 200 => {
           val results = (response.json \ "results").as[Seq[JsObject]]

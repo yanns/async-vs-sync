@@ -7,6 +7,7 @@ echo "starting applications"
 $DIRNAME/backends/search/target/start -Dhttp.port=9001 -Ddown=true -DresponseTime=30000 &
 $DIRNAME/backends/payment/target/start -Dhttp.port=9002 &
 $DIRNAME/async/scalastore/target/start -Dhttp.port=9000 &
+$DIRNAME/async/javastore/target/start -Dhttp.port=9003 &
 $DIRNAME/server/apache-tomcat-7.0.40/bin/catalina.sh start
 
 
@@ -23,5 +24,8 @@ kill -SIGTERM $payment_pid
 
 scalastore_pid=`cat $DIRNAME/async/scalastore/RUNNING_PID`
 kill -SIGTERM $scalastore_pid
+
+javastore_pid=`cat $DIRNAME/async/javastore/RUNNING_PID`
+kill -SIGTERM $javastore_pid
 
 $DIRNAME/server/apache-tomcat-7.0.40/bin/catalina.sh stop

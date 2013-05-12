@@ -23,3 +23,7 @@ pushd $DIRNAME/async/scalastore
 sbt stage &
 popd
 
+pushd $DIRNAME/async/javastore
+sbt stage &
+popd
+
