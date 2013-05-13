@@ -20,34 +20,38 @@ public class Backends {
         });
     }
 
-    public Promise<List<Order>> getOrdersForUser(String email) {
+    public Promise<List<Order>> getOrdersForUser(final String email) {
         return Akka.future(new Callable<List<Order>>() {
             @Override
             public List<Order> call() throws Exception {
                 List<Order> result = new ArrayList<>();
-                result.add(new Order());
+                result.add(new Order("productA", email));
                 return result;
             }
         });
     }
 
-    public Promise<List<Product>> getProductsForOrders(List<Order> orders) {
+    public Promise<List<Product>> getProductsForOrders(final List<Order> orders) {
         return Akka.future(new Callable<List<Product>>() {
             @Override
             public List<Product> call() throws Exception {
                 List<Product> products = new ArrayList<>();
-                products.add(new Product());
+                for (Order order : orders) {
+                    products.add(new Product(order.getProductId(), "description"));
+                }
                 return products;
             }
         });
     }
 
-    public Promise<List<Stock>> getStocksForProducts(List<Product> products) {
+    public Promise<List<Stock>> getStocksForProducts(final List<Product> products) {
         return Akka.future(new Callable<List<Stock>>() {
             @Override
             public List<Stock> call() throws Exception {
                 List<Stock> stocks = new ArrayList<>();
-                stocks.add(new Stock());
+                for (Product product : products) {
+                    stocks.add(new Stock(product.getProductId(), 5));
+                }
                 return stocks;
             }
         });

@@ -21,7 +21,9 @@ trait Backends {
     Future.successful(List(Order(ProductId("abc"), email)))
 
   def getProductsForOrders(orders: Seq[Order]): Future[Seq[Product]] =
-    Future.successful(List(Product(ProductId("abc"), "description")))
+    Future.successful(
+      for (order <- orders) yield Product(order.productId, "description")
+    )
 
   def getStocksForProducts(products: Seq[Product]): Future[Seq[Stock]] =
     Future.successful(
