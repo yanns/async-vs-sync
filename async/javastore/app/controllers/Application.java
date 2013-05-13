@@ -11,6 +11,8 @@ import views.html.index;
 
 import java.util.List;
 
+import static play.libs.F.Promise;
+
 public class Application extends Controller {
 
     private static final StockQuery stockQuery = new StockQuery();
@@ -21,7 +23,7 @@ public class Application extends Controller {
     }
 
     public static Result search(String query) {
-        F.Promise<JsonNode> resultPromise = stockQuery.searchStock(query);
+        Promise<JsonNode> resultPromise = stockQuery.searchStock(query);
         return async(
             resultPromise.map(new F.Function<JsonNode, Result>() {
                 @Override
@@ -55,7 +57,7 @@ public class Application extends Controller {
 
     public static Result payments() {
         Payment payment = paymentForm.bindFromRequest().get();
-        F.Promise<String> stringPromise = paymentService.proceedPayments(payment.amount);
+        Promise<String> stringPromise = paymentService.proceedPayments(payment.amount);
         return async(
             stringPromise.map(new F.Function<String, Result>() {
                 @Override

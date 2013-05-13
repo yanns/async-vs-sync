@@ -4,10 +4,12 @@ import org.codehaus.jackson.JsonNode;
 import play.libs.F;
 import play.libs.WS;
 
+import static play.libs.F.Promise;
+
 public class StockQuery {
 
-    public F.Promise<JsonNode> searchStock(String query) {
-        F.Promise<WS.Response> responsePromise = WS.url("http://localhost:9001/search").setQueryParameter("query", query).get();
+    public Promise<JsonNode> searchStock(String query) {
+        Promise<WS.Response> responsePromise = WS.url("http://localhost:9001/search").setQueryParameter("query", query).get();
         return responsePromise.map(new F.Function<WS.Response, JsonNode>() {
             @Override
             public JsonNode apply(WS.Response response) throws Throwable {

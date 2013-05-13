@@ -7,31 +7,33 @@ import play.mvc.Result;
 
 import java.util.List;
 
+import static play.libs.F.Promise;
+
 public class ApplicationWithMultipleBackends extends Controller {
 
     private static final Backends backends = new Backends();
 
     public static Result index(String userId) {
-        F.Promise<User> user = backends.getUserById(userId);
-        F.Promise<List<Order>> orders = user.flatMap(new F.Function<User, F.Promise<List<Order>>>() {
+        Promise<User> user = backends.getUserById(userId);
+        Promise<List<Order>> orders = user.flatMap(new F.Function<User, Promise<List<Order>>>() {
             @Override
-            public F.Promise<List<Order>> apply(User user) throws Throwable {
+            public Promise<List<Order>> apply(User user) throws Throwable {
                 return backends.getOrdersForUser(user.getEmail());
             }
         });
-        F.Promise<List<Product>> products = orders.flatMap(new F.Function<List<Order>, F.Promise<List<Product>>>() {
+        Promise<List<Product>> products = orders.flatMap(new F.Function<List<Order>, Promise<List<Product>>>() {
             @Override
-            public F.Promise<List<Product>> apply(List<Order> orders) throws Throwable {
+            public Promise<List<Product>> apply(List<Order> orders) throws Throwable {
                 return backends.getProductsForOrders(orders);
             }
         });
-        F.Promise<List<Stock>> stocks = products.flatMap(new F.Function<List<Product>, F.Promise<List<Stock>>>() {
+        Promise<List<Stock>> stocks = products.flatMap(new F.Function<List<Product>, Promise<List<Stock>>>() {
             @Override
-            public F.Promise<List<Stock>> apply(List<Product> products) throws Throwable {
+            public Promise<List<Stock>> apply(List<Product> products) throws Throwable {
                 return backends.getStocksForProducts(products);
             }
         });
-        F.Promise<List<Object>> promises = F.Promise.sequence(user, orders, products, stocks);
+        Promise<List<Object>> promises = Promise.sequence(user, orders, products, stocks);
         return async(
             promises.map(new F.Function<List<Object>, Result>() {
                 @Override

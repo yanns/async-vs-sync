@@ -7,12 +7,14 @@ import play.libs.WS;
 import java.util.HashMap;
 import java.util.Map;
 
+import static play.libs.F.Promise;
+
 public class PaymentService {
 
-    public F.Promise<String> proceedPayments(Integer amount) {
+    public Promise<String> proceedPayments(Integer amount) {
         Map<String, Object> jsonRequest = new HashMap<String, Object>();
         jsonRequest.put("amount", amount);
-        F.Promise<WS.Response> responsePromise = WS.url("http://localhost:9002/payments").post(Json.toJson(jsonRequest));
+        Promise<WS.Response> responsePromise = WS.url("http://localhost:9002/payments").post(Json.toJson(jsonRequest));
         return responsePromise.map(new F.Function<WS.Response, String>() {
             @Override
             public String apply(WS.Response response) throws Throwable {
