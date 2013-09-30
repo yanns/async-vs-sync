@@ -13,7 +13,7 @@ public class ApplicationWithMultipleBackends extends Controller {
 
     private static final Backends backends = new Backends();
 
-    public static Result index(String userId) {
+    public static Promise<Result> index(String userId) {
         Promise<User> user = backends.getUserById(userId);
         Promise<List<Order>> orders = user.flatMap(new F.Function<User, Promise<List<Order>>>() {
             @Override
@@ -34,17 +34,15 @@ public class ApplicationWithMultipleBackends extends Controller {
             }
         });
         Promise<List<Object>> promises = Promise.sequence(user, orders, products, stocks);
-        return async(
-            promises.map(new F.Function<List<Object>, Result>() {
+        return promises.map(new F.Function<List<Object>, Result>() {
                 @Override
                 public Result apply(List<Object> results) throws Throwable {
-                    User user = (User)results.get(0);
-                    List<Order> orders = (List<Order>)results.get(1);
-                    List<Product> products = (List<Product>)results.get(2);
-                    List<Stock> stocks = (List<Stock>)results.get(3);
-                    return ok(orders.size() + " order(s) for user " + user.getEmail());
-                }
-            })
-        );
+                User user = (User)results.get(0);
+                List<Order> orders = (List<Order>)results.get(1);
+                List<Product> products = (List<Product>)results.get(2);
+                List<Stock> stocks = (List<Stock>)results.get(3);
+                return ok(orders.size() + " order(s) for user " + user.getEmail());
+            }
+        });
     }
 }

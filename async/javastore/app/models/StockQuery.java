@@ -1,6 +1,6 @@
 package models;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import play.libs.F;
 import play.libs.WS;
 

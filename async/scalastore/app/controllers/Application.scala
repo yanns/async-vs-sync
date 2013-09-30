@@ -14,24 +14,20 @@ object Application extends Controller with StockQuery with Payment {
     Ok(views.html.index())
   }
 
-  def search(query: String) = Action {
-    Async {
-      searchStock(query).map {
-        case Success(results) => Ok(results.map(_ \ "description").mkString("Found results: ", ", ", ".\n"))
-        case Failure(e)       => InternalServerError(e.getMessage)
-      }
+  def search(query: String) = Action.async {
+    searchStock(query).map {
+      case Success(results) => Ok(results.map(_ \ "description").mkString("Found results: ", ", ", ".\n"))
+      case Failure(e)       => InternalServerError(e.getMessage)
     }
   }
 
   val paymentForm = Form("amount" -> number)
 
-  def payments = Action { implicit request =>
+  def payments = Action.async { implicit request =>
     val amount = paymentForm.bindFromRequest.get
-    Async {
-      proceedPayments(amount).map {
-        case Success(msg) => Ok(msg)
-        case Failure(e)   => InternalServerError(e.getMessage)
-      }
+    proceedPayments(amount).map {
+      case Success(msg) => Ok(msg)
+      case Failure(e)   => InternalServerError(e.getMessage)
     }
   }
 }

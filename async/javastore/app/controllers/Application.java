@@ -1,8 +1,8 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.PaymentService;
 import models.StockQuery;
-import org.codehaus.jackson.JsonNode;
 import play.data.Form;
 import play.libs.F;
 import play.mvc.Controller;
@@ -22,32 +22,30 @@ public class Application extends Controller {
         return ok(index.render());
     }
 
-    public static Result search(String query) {
+    public static Promise<Result> search(String query) {
         Promise<JsonNode> resultPromise = stockQuery.searchStock(query);
-        return async(
-            resultPromise.map(new F.Function<JsonNode, Result>() {
-                @Override
-                public Result apply(JsonNode jsonNode) throws Throwable {
-                    boolean first = true;
-                    String result = "Found results: ";
-                    List<String> descriptions = jsonNode.findValuesAsText("description");
-                    for (String description : descriptions) {
-                        if (!first) {
-                            result += ", ";
-                        }
-                        result += description;
-                        first = false;
+        return resultPromise.map(new F.Function<JsonNode, Result>() {
+            @Override
+            public Result apply(JsonNode jsonNode) throws Throwable {
+                boolean first = true;
+                String result = "Found results: ";
+                List<String> descriptions = jsonNode.findValuesAsText("description");
+                for (String description : descriptions) {
+                    if (!first) {
+                        result += ", ";
                     }
-                    result += ".\n";
-                    return ok(result);
+                    result += description;
+                    first = false;
                 }
-            }).recover(new F.Function<Throwable, Result>() {
-                @Override
-                public Result apply(Throwable e) throws Throwable {
-                    return internalServerError(e.getMessage());
-                }
-            })
-        );
+                result += ".\n";
+                return ok(result);
+            }
+        }).recover(new F.Function<Throwable, Result>() {
+            @Override
+            public Result apply(Throwable e) throws Throwable {
+                return internalServerError(e.getMessage());
+            }
+        });
     }
 
     public static class Payment {
@@ -55,22 +53,20 @@ public class Application extends Controller {
     }
     private static Form<Payment> paymentForm = Form.form(Payment.class);
 
-    public static Result payments() {
+    public static Promise<Result> payments() {
         Payment payment = paymentForm.bindFromRequest().get();
         Promise<String> stringPromise = paymentService.proceedPayments(payment.amount);
-        return async(
-            stringPromise.map(new F.Function<String, Result>() {
-                @Override
-                public Result apply(String result) throws Throwable {
-                    return ok(result);
-                }
-            }).recover(new F.Function<Throwable, Result>() {
-                @Override
-                public Result apply(Throwable e) throws Throwable {
-                    return internalServerError(e.getMessage());
-                }
-            })
-        );
+        return stringPromise.map(new F.Function<String, Result>() {
+            @Override
+            public Result apply(String result) throws Throwable {
+                return ok(result);
+            }
+        }).recover(new F.Function<Throwable, Result>() {
+            @Override
+            public Result apply(Throwable e) throws Throwable {
+                return internalServerError(e.getMessage());
+            }
+        });
     }
   
 }
