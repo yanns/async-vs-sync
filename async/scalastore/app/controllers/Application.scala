@@ -15,9 +15,10 @@ object Application extends Controller with StockQuery with Payment {
   }
 
   def search(query: String) = Action.async {
-    searchStock(query).map {
-      case Success(results) => Ok(results.map(_ \ "description").mkString("Found results: ", ", ", ".\n"))
-      case Failure(e)       => InternalServerError(e.getMessage)
+    searchStock(query).map { results =>
+      Ok(results.map(_ \ "description").mkString("Found results: ", ", ", ".\n"))
+    }.recover {
+      case e: Exception => InternalServerError(e.getMessage)
     }
   }
 
